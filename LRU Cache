@@ -1,0 +1,164 @@
+package com.hashing.heap;
+
+import java.util.HashMap;
+import java.util.Map;
+
+class Nod{
+	
+	
+	Nod prev;
+	Nod next;
+	int key;
+	int value;
+	
+	public Nod(  int key,int value) {
+		super();
+		this.key = key;
+		this.value = value;
+	}
+
+	public Nod() {
+		super();
+	}
+	
+	
+}
+
+public class LRU {
+	
+	static HashMap<Integer,Nod> cache=new HashMap<Integer,Nod>();
+	static int capacity=4;
+	static Nod front;
+	static Nod rear;
+
+	public static void main(String[] args) {
+	
+		put(12,100);
+		put(14,200);
+		put(16,300);
+		put(15,100);
+		put(12,500);
+		put(17,600);
+		put(12,100);
+		put(17,600);
+		put(16,600);
+		put(20,600);
+		put(25,600);
+		put(30,600);
+		System.out.println("Size Of Cache::"+cache.size());
+		System.out.println("front key::"+front.key+"front value::"+front.value);
+
+		System.out.println("rear key::"+rear.key+"rear value::"+rear.value);
+		
+		 for (Map.Entry<Integer,Nod> e : cache.entrySet())
+	            System.out.println("Key: " + e.getKey()
+	                               + " Value: " + e.getValue().value);
+		
+	}
+
+	private static void put(int i, int j) {
+		
+		Nod myNode=new Nod(i,j);
+		
+		//System.out.println(myNode.prev+" ,"+myNode.key+" ,"+myNode.value+" ,"+myNode.next);
+		
+		//System.out.println(cache.size());
+		if(cache.size()<capacity){
+			
+			if(get(i)==-1){
+				
+				if(front==null){
+					cache.put(i, myNode);
+					front=myNode;
+					rear=myNode;
+				}else{
+					cache.put(i, myNode);
+					rear.next=myNode;
+					myNode.prev=rear;
+					rear=myNode;
+				}
+				
+			}
+			else{
+				Nod temp=cache.get(i);
+				if(front==rear){
+					
+				}
+				else if(front==temp){
+					front.next.prev=null;
+					front=front.next;
+					temp.prev=rear;
+					rear.next=temp;
+					temp.next=null;
+					rear=temp;
+				}
+				
+				
+			}
+			
+		}else if(cache.size()==capacity){
+			//System.out.println("I am in equal capacity");
+			//if capacity is full but we need to add this element and remove front 
+			if(get(i)==-1){
+				rear.next=myNode;
+				myNode.prev=rear;
+				rear=myNode;
+				int t=front.key;
+				cache.remove(t);
+				front.next.prev=null;
+				Nod temp=front.next;
+				front.next=null;
+				front=temp;
+				cache.put(i, myNode);
+			}
+			else{
+				//if capacity is full and and element is present is LRU or its front element then we will make that rear 
+				Nod temp=cache.get(i);
+				
+				if(temp==front){
+					//System.out.println("Hello");
+					front.next.prev=null;
+					front=front.next;
+					temp.prev=rear;
+					rear.next=temp;
+					temp.next=null;
+					rear=temp;
+				}
+				else if(temp==rear){
+					
+				}else{
+					//if capacity is full and element is present in LRU so we  will update the LRU and add this element in place of rear
+					temp.prev.next=temp.next;
+					temp.next.prev=temp.prev;
+					temp.next.next=temp;
+					temp.prev=temp.prev.next;
+					temp.next=null;
+					rear=temp;
+				}
+				
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+
+	private static int get(int i) {
+		if(cache.containsKey(i)){
+			System.out.println("The Key Is Found/Available::"+i);
+			return i;
+		}else{
+			System.out.println("The Key Is Not Found/Available::"+i);
+			return -1;
+		}
+		
+	}
+
+	
+
+}
